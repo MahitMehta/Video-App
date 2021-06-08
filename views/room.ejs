@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>FinShark</title>
+        <link href="/css/room.css" rel="stylesheet" />
+        <script src='/socket.io/socket.io.js'></script>
+        <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
+        <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js'></script>
+    </head>
+    <body>
+        <section class='video-section'></section>
+        <script>
+            const ROOM_ID = '<%=roomId%>';
+            const socket = io('/');
+
+            const peer = new Peer();
+
+            const videoSection = document.querySelector('.video-section');
+            const myVideo = document.createElement('video');
+            myVideo.muted = true;
+
+
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+                addVideoStream(stream, myVideo);
+
+                peer.on('call', call => {
+                    const video = document.createElement('video');
+
+                    call.answer(stream);
+
+                    call.on('stream', function(remoteStream) {
+                        addVideoStream(remoteStream, video);
+                    });
+
+                });
+
+                socket.on('new-member', userId => {
+                    // console.log("new user");
+                    connectToNewUser(userId, stream);
+                });
+            });
+
+            socket.on('disconnect-user', userId => {
+                console.log('%cdisconnect --> ', "color:red", userId);
+                const videoById = document.getElementById(userId);
+                videoById.remove();
+            });
+
+            peer.on('open', id => {
+                socket.emit('join-room', ROOM_ID, id);
+            });
+
+
+            function connectToNewUser(userId, stream) {
+                const call = peer.call(userId, stream);
+                const video = document.createElement('video');
+                video.id = userId; 
+
+                call.on('stream', userVideoStream => {
+                    addVideoStream(userVideoStream, video);
+                });
+            }
+
+            function addVideoStream(stream, video) {
+                video.srcObject = stream;
+                video.addEventListener('loadedmetadata', () => video.play());
+                videoSection.appendChild(video);
+            }
+
+        </script>
+    </body>
+</html>

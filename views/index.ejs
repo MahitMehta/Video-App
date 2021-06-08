@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/index.css">
+    <title>FinShark</title>
+</head>
+<body>
+    <script>
+        function createRoom() {
+            const origin = window.location.origin;
+            window.location.href = `${origin}/room`;
+        }
+    </script>
+    <h1 class="title">FinShark<sup>BETA</sup></h1>
+    <button class="create-room" onClick="createRoom()">Create New Room</button>
+</body>
+</html>
