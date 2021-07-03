@@ -19,6 +19,7 @@
 
             const videoSection = document.querySelector('.video-section');
             const myVideo = document.createElement('video');
+            myVideo.setAttribute("playsinline", true);
             myVideo.muted = true;
 
 
@@ -56,6 +57,7 @@
             function connectToNewUser(userId, stream) {
                 const call = peer.call(userId, stream);
                 const video = document.createElement('video');
+                video.setAttribute("playsinline", true);
                 video.id = userId; 
 
                 call.on('stream', userVideoStream => {
